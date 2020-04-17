@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,9 +22,7 @@ namespace DocCreator
         {
             using (var dialog = new FolderBrowserDialog())
             {
-                DialogResult result = dialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
                 {
                     this.SelectedFolderTextbox.Text = dialog.SelectedPath;
                 }
@@ -38,7 +37,7 @@ namespace DocCreator
                 dialog.Title = "Select Starting Document";
                 dialog.Filter = "Doc Files|*.docx";
                 dialog.InitialDirectory = @"C:\";
-                if(dialog.ShowDialog() == DialogResult.OK)
+                if(dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
                 {
                     startFilePath = dialog.FileName.ToString();
                 }
