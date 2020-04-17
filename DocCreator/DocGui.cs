@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DocCreator
@@ -20,10 +12,12 @@ namespace DocCreator
 
         private void BrowseFoldersButton_Click(object sender, EventArgs e)
         {
+            // Get the folder to the image files
             using (var dialog = new FolderBrowserDialog())
             {
                 if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
                 {
+                    // Set the text box value for display / storage of selection
                     this.SelectedFolderTextbox.Text = dialog.SelectedPath;
                 }
             }
@@ -31,13 +25,14 @@ namespace DocCreator
 
         private void DocufyButton_Click(object sender, EventArgs e)
         {
+            // User selects existing doc file
             string startFilePath;
-            using(var dialog = new OpenFileDialog())
+            using (var dialog = new OpenFileDialog())
             {
                 dialog.Title = "Select Starting Document";
                 dialog.Filter = "Doc Files|*.docx";
                 dialog.InitialDirectory = @"C:\";
-                if(dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
                 {
                     startFilePath = dialog.FileName.ToString();
                 }
@@ -47,8 +42,9 @@ namespace DocCreator
                 }
             }
 
+            // Instantiate the core and give it the image folder / start path
             var core = new DocCore(this.SelectedFolderTextbox.Text);
-            if(!core.Docufy(startFilePath))
+            if (!core.Docufy(startFilePath))
             {
                 MessageBox.Show("Failed to Docufy");
             }
