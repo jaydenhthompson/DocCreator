@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 
@@ -9,7 +10,6 @@ namespace DocCreator
     partial class DocCore
     {
         private readonly string folderPath;
-        private string startFilePath;
 
         public DocCore()
         {
@@ -34,17 +34,35 @@ namespace DocCreator
 
             Application word = new Application();
             Document document = word.Documents.Open(startFile);
-            word.Visible = true;
+            //word.Visible = true; // enable for debugging
 
-            foreach(var file in files)
+            // Calculate maximum picture width / height
+            var widthMargins = document.PageSetup.LeftMargin + document.PageSetup.RightMargin;
+            var heightMargins = document.PageSetup.TopMargin + document.PageSetup.BottomMargin;
+            var imageWidth = document.PageSetup.PageWidth - widthMargins;
+            var imageHeight = document.PageSetup.PageHeight - heightMargins;
+
+            foreach (var file in files)
             {
                 var newParagraph = document.Paragraphs.Add();
-                newParagraph.Range.InsertBreak(WdBreakType.wdPageBreak);
-                document.InlineShapes.AddPicture(file, Range: newParagraph.Range);
+                newParagraph.PageBreakBefore = -1;
+                InlineShape map = document.InlineShapes.AddPicture(file, Range: newParagraph.Range);
+                if (map.Width > map.Height)
+                {
+                    var ratio = map.Height / map.Width;
+                    map.Width = imageWidth;
+                    map.Height = map.Width * ratio;
+                }
+                else
+                {
+                    var ratio = map.Width / map.Height;
+                    map.Height = imageHeight;
+                    map.Width = map.Height * ratio;
+                }
             }
 
-            //wordDoc.Save();
-            document.Saved = true;
+            //document.Saved = true; // Enable for debugging 
+            document.Save();
             word.Quit();
 
             return true;
