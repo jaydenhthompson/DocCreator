@@ -31,6 +31,7 @@
             this.BrowseFoldersButton = new System.Windows.Forms.Button();
             this.SelectedFolderTextbox = new System.Windows.Forms.RichTextBox();
             this.DocufyButton = new System.Windows.Forms.Button();
+            this.configuratorButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // BrowseFoldersButton
@@ -57,19 +58,30 @@
             // DocufyButton
             // 
             this.DocufyButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DocufyButton.Location = new System.Drawing.Point(163, 165);
+            this.DocufyButton.Location = new System.Drawing.Point(163, 161);
             this.DocufyButton.Name = "DocufyButton";
-            this.DocufyButton.Size = new System.Drawing.Size(155, 39);
+            this.DocufyButton.Size = new System.Drawing.Size(155, 47);
             this.DocufyButton.TabIndex = 3;
             this.DocufyButton.Text = "Docufy";
             this.DocufyButton.UseVisualStyleBackColor = true;
             this.DocufyButton.Click += new System.EventHandler(this.DocufyButton_Click);
+            // 
+            // configuratorButton
+            // 
+            this.configuratorButton.Location = new System.Drawing.Point(469, 218);
+            this.configuratorButton.Name = "configuratorButton";
+            this.configuratorButton.Size = new System.Drawing.Size(25, 25);
+            this.configuratorButton.TabIndex = 4;
+            this.configuratorButton.Text = ".";
+            this.configuratorButton.UseVisualStyleBackColor = true;
+            this.configuratorButton.Click += new System.EventHandler(this.configuratorButton_Click);
             // 
             // DocGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(506, 255);
+            this.Controls.Add(this.configuratorButton);
             this.Controls.Add(this.DocufyButton);
             this.Controls.Add(this.SelectedFolderTextbox);
             this.Controls.Add(this.BrowseFoldersButton);
@@ -84,6 +96,7 @@
         private System.Windows.Forms.Button BrowseFoldersButton;
         private System.Windows.Forms.RichTextBox SelectedFolderTextbox;
         private System.Windows.Forms.Button DocufyButton;
+        private System.Windows.Forms.Button configuratorButton;
     }
 }
 

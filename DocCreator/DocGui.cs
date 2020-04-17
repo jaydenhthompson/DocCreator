@@ -53,5 +53,11 @@ namespace DocCreator
                 MessageBox.Show("Failed to Docufy");
             }
         }
+
+        private void configuratorButton_Click(object sender, EventArgs e)
+        {
+            var configurator = new Configurator();
+            configurator.Show();
+        }
     }
 }
