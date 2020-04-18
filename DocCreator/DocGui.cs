@@ -1,13 +1,17 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace DocCreator
 {
     public partial class DocGui : Form
     {
+        private Config config;
+
         public DocGui()
         {
             InitializeComponent();
+            this.config = new Config();
         }
 
         private void BrowseFoldersButton_Click(object sender, EventArgs e)
@@ -19,6 +23,7 @@ namespace DocCreator
                 {
                     // Set the text box value for display / storage of selection
                     this.SelectedFolderTextbox.Text = dialog.SelectedPath;
+                    this.config.imageFolderPath = dialog.SelectedPath;
                 }
             }
         }
@@ -26,25 +31,15 @@ namespace DocCreator
         private void DocufyButton_Click(object sender, EventArgs e)
         {
             // User selects existing doc file
-            string startFilePath;
-            using (var dialog = new OpenFileDialog())
+            GetExistingFilePath();
+            if (!File.Exists(this.config.existingDocPath))
             {
-                dialog.Title = "Select Starting Document";
-                dialog.Filter = "Doc Files|*.docx";
-                dialog.InitialDirectory = @"C:\";
-                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
-                {
-                    startFilePath = dialog.FileName.ToString();
-                }
-                else
-                {
-                    return;
-                }
+                MessageBox.Show($"File {this.config.existingDocPath} does not exist");
             }
 
             // Instantiate the core and give it the image folder / start path
-            var core = new DocCore(this.SelectedFolderTextbox.Text);
-            if (!core.Docufy(startFilePath))
+            var core = new DocCore(config);
+            if (!core.Docufy())
             {
                 MessageBox.Show("Failed to Docufy");
             }
@@ -53,7 +48,24 @@ namespace DocCreator
         private void configuratorButton_Click(object sender, EventArgs e)
         {
             var configurator = new Configurator();
-            configurator.Show();
+            if (configurator.ShowDialog() == DialogResult.OK)
+            {
+                this.config = configurator.newConfig;
+            }
+        }
+
+        private void GetExistingFilePath()
+        {
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Title = "Select Starting Document";
+                dialog.Filter = "Doc Files|*.docx";
+                dialog.InitialDirectory = @"C:\";
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
+                {
+                    this.config.existingDocPath = dialog.FileName.ToString();
+                }
+            }
         }
     }
 }

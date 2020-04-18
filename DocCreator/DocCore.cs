@@ -7,12 +7,11 @@ namespace DocCreator
 {
     partial class DocCore
     {
-        private readonly string folderPath;
         private readonly Config config;
 
-        public DocCore(string path)
+        public DocCore(Config newConfig)
         {
-            this.folderPath = path;
+            this.config = newConfig;
         }
 
         /// <summary>
@@ -24,10 +23,10 @@ namespace DocCreator
         /// <returns>
         /// Returns a bool indicating success
         /// </returns>
-        public bool Docufy(string startFilePath)
+        public bool Docufy()
         {
             // Load Files into list
-            var files = new List<string>(Directory.GetFiles(this.folderPath));
+            var files = new List<string>(Directory.GetFiles(this.config.imageFolderPath));
 
             // Remove all non jpg files from the list and verify there are files left
             files.RemoveAll(file => Path.GetExtension(file).ToLower() != ".jpg");
@@ -37,7 +36,7 @@ namespace DocCreator
             }
 
             Application word  = new Application();
-            Document document = word.Documents.Open(startFilePath);
+            Document document = word.Documents.Open(this.config.existingDocPath);
             //word.Visible    = true; // enable for debugging
 
             // Calculate maximum picture width / height
