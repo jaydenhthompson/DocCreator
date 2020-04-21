@@ -1,10 +1,6 @@
 ﻿using Microsoft.Office.Interop.Word;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DocCreator
 {
@@ -44,7 +40,7 @@ namespace DocCreator
 
             // Open the word document in the correct manner
             this.wordApplication = new Application();
-            if(!File.Exists(iFilePath) || iForce)
+            if (!File.Exists(iFilePath) || iForce)
             {
                 this.wordDocument = wordApplication.Documents.Add();
                 this.newFile = true;
@@ -134,7 +130,7 @@ namespace DocCreator
             var bulletParagraph = this.wordDocument.Paragraphs.Add();
             bulletParagraph.Range.ListFormat.ApplyBulletDefault();
 
-            for(var i = 0; i < iBulletPoints.Count; ++i)
+            for (var i = 0; i < iBulletPoints.Count; ++i)
             {
                 if (i < iBulletPoints.Count - 1)
                     bulletParagraph.Range.InsertBefore(iBulletPoints[i] + '\n');
