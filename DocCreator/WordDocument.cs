@@ -65,13 +65,22 @@ namespace DocCreator
             // These will eventually be dynamic in the config
             this.maxContentWidth *= 0.85f;
             this.maxContentHeight *= 0.85f;
+
+            // Get to a clean page if an existing document is being used
+            if (!this.newFile)
+            {
+                object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+                var mainTitleParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
+                mainTitleParagraph.Format.SpaceAfter = 6;
+                mainTitleParagraph.Range.InsertParagraphAfter();
+            }
         }
 
         public void AddTableOfContentsToDocument(string iMainTitle,
                                                  string iSubTitle,
                                                  List<string> iBulletPoints)
         {
-            this.AddPageHeaders(iMainTitle, iSubTitle);
+            this.AddPageHeaders(iMainTitle, iSubTitle, false);
             this.AddPageBullets(iBulletPoints);
         }
 
@@ -82,22 +91,8 @@ namespace DocCreator
                                          List<string> iBulletPoints)
         {
             this.AddPageHeaders(iMainTitle, iSubTitle);
-
-            // Add Images
-            object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
-            var imageParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
-            InlineShape leftImage = this.wordDocument.InlineShapes.AddPicture(iLeftImagePath,
-                                                                              Range: imageParagraph.Range);
-            this.SetImageParameters(ref leftImage, 2);
-
-            InlineShape rightImage = this.wordDocument.InlineShapes.AddPicture(iRightImagePath,
-                                                                               Range: imageParagraph.Range);
-            this.SetImageParameters(ref rightImage, 2);
-            imageParagraph.Format.SpaceAfter = 6;
-            imageParagraph.Range.InsertParagraphAfter();
-
+            this.AddImages(iLeftImagePath, iRightImagePath);
             this.AddPageBullets(iBulletPoints);
-
         }
 
         public void CloseDocument()
@@ -114,14 +109,17 @@ namespace DocCreator
 
         }
 
-        ///////////////////////
-        // Private Functions //
-        ///////////////////////
+        #region PrivateFunctions
 
         private void AddPageHeaders(string iMain,
-                                    string iSub)
+                                    string iSub,
+                                    bool addBreak = true)
         {
-            this.wordDocument.Words.Last.InsertBreak(WdBreakType.wdPageBreak);
+            if (addBreak)
+            {
+                this.wordDocument.Words.Last.InsertBreak(WdBreakType.wdPageBreak);
+            }
+
             object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
             var mainTitleParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
             mainTitleParagraph.Range.Text = iMain;
@@ -139,6 +137,21 @@ namespace DocCreator
             subTitleParagraph.Range.InsertParagraphAfter();
 
             return;
+        }
+
+        private void AddImages(string iLeftImagePath, string iRightImagePath)
+        {
+            object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+            var imageParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
+
+            InlineShape rightImage = this.wordDocument.InlineShapes.AddPicture(iRightImagePath, Range: imageParagraph.Range);
+            this.SetImageParameters(ref rightImage, 2);
+
+            InlineShape leftImage = this.wordDocument.InlineShapes.AddPicture(iLeftImagePath, Range: imageParagraph.Range);
+            this.SetImageParameters(ref leftImage, 2);
+
+            imageParagraph.Format.SpaceAfter = 6;
+            imageParagraph.Range.InsertParagraphAfter();
         }
 
         private void AddPageBullets(List<string> iBulletPoints)
@@ -167,5 +180,7 @@ namespace DocCreator
             image.Width = this.maxContentWidth / numberOfSideBySideImages;
             image.Height = image.Width * ratio;
         }
+
+        #endregion
     }
 }
