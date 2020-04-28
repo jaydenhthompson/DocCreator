@@ -21,6 +21,8 @@ namespace DocCreator
 
         private bool newFile;
 
+        private object endOfDoc = "\\endofdoc";
+
         //////////////////////
         // Public Functions //
         //////////////////////
@@ -59,6 +61,10 @@ namespace DocCreator
 
             this.maxContentWidth = this.wordDocument.PageSetup.PageWidth - sideMargins;
             this.maxContentHeight = this.wordDocument.PageSetup.PageHeight - topBottomMargins;
+
+            // These will eventually be dynamic in the config
+            this.maxContentWidth *= 0.85f;
+            this.maxContentHeight *= 0.85f;
         }
 
         public void AddTableOfContentsToDocument(string iMainTitle,
@@ -78,7 +84,8 @@ namespace DocCreator
             this.AddPageHeaders(iMainTitle, iSubTitle);
 
             // Add Images
-            var imageParagraph = this.wordDocument.Paragraphs.Add();
+            object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+            var imageParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
             InlineShape leftImage = this.wordDocument.InlineShapes.AddPicture(iLeftImagePath,
                                                                               Range: imageParagraph.Range);
             this.SetImageParameters(ref leftImage, 2);
@@ -86,8 +93,11 @@ namespace DocCreator
             InlineShape rightImage = this.wordDocument.InlineShapes.AddPicture(iRightImagePath,
                                                                                Range: imageParagraph.Range);
             this.SetImageParameters(ref rightImage, 2);
+            imageParagraph.Format.SpaceAfter = 6;
+            imageParagraph.Range.InsertParagraphAfter();
 
             this.AddPageBullets(iBulletPoints);
+
         }
 
         public void CloseDocument()
@@ -111,24 +121,33 @@ namespace DocCreator
         private void AddPageHeaders(string iMain,
                                     string iSub)
         {
-            var mainTitleParagraph = this.wordDocument.Paragraphs.Add();
-            mainTitleParagraph.PageBreakBefore = -1;
+            this.wordDocument.Words.Last.InsertBreak(WdBreakType.wdPageBreak);
+            object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+            var mainTitleParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
             mainTitleParagraph.Range.Text = iMain;
             mainTitleParagraph.Range.Font.Size = 28;
             mainTitleParagraph.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
+            mainTitleParagraph.Format.SpaceAfter = 6;
+            mainTitleParagraph.Range.InsertParagraphAfter();
 
-            var subTitleParagraph = this.wordDocument.Paragraphs.Add();
+            paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+            var subTitleParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
             subTitleParagraph.Range.Text = iSub;
             subTitleParagraph.Range.Font.Size = 22;
             subTitleParagraph.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
+            subTitleParagraph.Format.SpaceAfter = 6;
+            subTitleParagraph.Range.InsertParagraphAfter();
 
             return;
         }
 
         private void AddPageBullets(List<string> iBulletPoints)
         {
-            var bulletParagraph = this.wordDocument.Paragraphs.Add();
+            object paragraphRange = this.wordDocument.Bookmarks.get_Item(ref endOfDoc).Range;
+            var bulletParagraph = this.wordDocument.Content.Paragraphs.Add(ref paragraphRange);
             bulletParagraph.Range.ListFormat.ApplyBulletDefault();
+            bulletParagraph.Range.Font.Size = 14;
+            bulletParagraph.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
 
             for (var i = 0; i < iBulletPoints.Count; ++i)
             {
@@ -138,6 +157,8 @@ namespace DocCreator
                     bulletParagraph.Range.InsertBefore(iBulletPoints[i]);
 
             }
+            bulletParagraph.Format.SpaceAfter = 6;
+            bulletParagraph.Range.InsertParagraphAfter();
         }
 
         private void SetImageParameters(ref InlineShape image, int numberOfSideBySideImages)
