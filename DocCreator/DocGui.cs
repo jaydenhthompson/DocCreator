@@ -160,7 +160,7 @@ namespace DocCreator
             // Generate bullets
             List<string> bulletPointList = new List<string>();
             for (int i = 0; i < 2; i++)
-                bulletPointList.Add(this.GenerageRandomString(10));
+                bulletPointList.Add(i.ToString() + this.GenerageRandomString(10));
 
             string newFile = this.tbStartingDocument.Text.Replace(".docx", string.Format("-{0:yyyy-MM-dd_hh-mm-ss-tt}", DateTime.Now) + ".docx");
             if (File.Exists(this.tbStartingDocument.Text))
@@ -171,7 +171,11 @@ namespace DocCreator
             WordDocument doc = new WordDocument(newFile);
 
             doc.AddTableOfContentsToDocument("TOC Title", "TOC SubTitle", bulletPointListToc);
-            doc.AppendPageToDocument("Title", "SubTitle", this.tbLeftImage.Text, this.tbRightImage.Text, bulletPointList);
+
+            for (int i = 0; i < 3; ++i)
+            {
+                doc.AppendPageToDocument("Title", "SubTitle", this.tbLeftImage.Text, this.tbRightImage.Text, bulletPointList);
+            }
 
             doc.CloseDocument();
 
